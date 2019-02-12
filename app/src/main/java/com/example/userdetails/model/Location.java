@@ -8,7 +8,9 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.TimeZone;
 
-public class Location implements Parcelable {
+import io.realm.RealmObject;
+
+public class Location extends RealmObject implements Parcelable {
 
     @SerializedName("street")
     @Expose

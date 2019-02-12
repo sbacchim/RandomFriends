@@ -6,7 +6,9 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Registered implements Parcelable {
+import io.realm.RealmObject;
+
+public class Registered extends RealmObject implements Parcelable {
 
     @SerializedName("date")
     @Expose

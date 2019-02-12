@@ -23,6 +23,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+
 public class MainActivity extends AppCompatActivity implements CustomAdapter.CustomAdapterListener {
 
     Gson gson;
@@ -39,6 +42,10 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
         setContentView(R.layout.activity_main);
         users = new Users();
         names = new ArrayList<>();
+
+        Realm.init(this);
+        RealmConfiguration config = new RealmConfiguration.Builder().name("usersrealm.realm").build();
+        Realm.setDefaultConfiguration(config);
 
         Toolbar tb = findViewById(R.id.toolbar);
         setSupportActionBar(tb);
