@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.userdetails.model.Results;
+import com.squareup.picasso.Picasso;
 
 public class UsersHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -27,7 +28,8 @@ public class UsersHolder extends RecyclerView.ViewHolder implements View.OnClick
     }
 
     public void bindResult(Results result) {
-        new DownloadImageTask(this.imageView).execute(result.getPicture().getThumbnail());
+        //new DownloadImageTask(this.imageView).execute(result.getPicture().getThumbnail());
+        Picasso.get().load(result.getPicture().getThumbnail()).into(this.imageView);
         this.result = result;
         this.nameView.setText(new StringBuilder()
                 .append(Utils.caps(result.getName().getTitle())).append(" ")

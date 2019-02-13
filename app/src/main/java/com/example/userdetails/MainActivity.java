@@ -64,7 +64,9 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
         LinearLayoutManager llm = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(llm);
         recyclerView.hasFixedSize();
-        new GsonDeserializer().execute();
+
+        //Open list from DB
+        startupList();
 
         //Pull to refresh
         final SwipeRefreshLayout pullToRefresh = findViewById(R.id.pullToRefresh);
@@ -148,6 +150,18 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
             recyclerView.setAdapter(adapter);
             adapter.notifyDataSetChanged();
         }
+    }
+
+    public void startupList(){
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<Results> startList =
+                realm.where(Results.class).findAll();
+        users.setResults((ArrayList<Results>) realm.copyFromRealm(startList));
+        Collections.reverse(users.getResults());
+        adapter = new CustomAdapter(getBaseContext(),
+                R.layout.list_item, users.getResults());
+        recyclerView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
     }
 
     @Override
