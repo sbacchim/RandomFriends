@@ -6,7 +6,9 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Name implements Parcelable {
+import io.realm.RealmObject;
+
+public class Name extends RealmObject implements Parcelable {
 
     @SerializedName("title")
     @Expose
@@ -17,6 +19,8 @@ public class Name implements Parcelable {
     @SerializedName("last")
     @Expose
     private String last;
+
+    public Name(){}
 
     protected Name(Parcel in) {
         title = in.readString();
@@ -58,11 +62,6 @@ public class Name implements Parcelable {
 
     public void setLast(String last) {
         this.last = last;
-    }
-
-    @Override
-    public String toString() {
-        return "" + title + " " + first + " " + last + "";
     }
 
     @Override

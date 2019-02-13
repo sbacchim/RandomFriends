@@ -6,7 +6,9 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Picture implements Parcelable {
+import io.realm.RealmObject;
+
+public class Picture extends RealmObject implements Parcelable {
 
     @SerializedName("large")
     @Expose
@@ -17,6 +19,8 @@ public class Picture implements Parcelable {
     @SerializedName("thumbnail")
     @Expose
     private String thumbnail;
+
+    public Picture(){}
 
     protected Picture(Parcel in) {
         large = in.readString();

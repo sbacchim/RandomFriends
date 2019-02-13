@@ -6,7 +6,9 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Id implements Parcelable {
+import io.realm.RealmObject;
+
+public class Id extends RealmObject implements Parcelable {
 
     @SerializedName("name")
     @Expose
@@ -14,6 +16,8 @@ public class Id implements Parcelable {
     @SerializedName("value")
     @Expose
     private String value;
+
+    public Id () {}
 
     protected Id(Parcel in) {
         name = in.readString();

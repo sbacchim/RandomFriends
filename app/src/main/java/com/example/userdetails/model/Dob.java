@@ -6,7 +6,10 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Dob implements Parcelable {
+import io.realm.Realm;
+import io.realm.RealmObject;
+
+public class Dob extends RealmObject implements Parcelable {
 
     @SerializedName("date")
     @Expose
@@ -14,6 +17,8 @@ public class Dob implements Parcelable {
     @SerializedName("age")
     @Expose
     private Integer age;
+
+    public Dob(){}
 
     protected Dob(Parcel in) {
         date = in.readString();

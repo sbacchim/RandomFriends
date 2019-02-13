@@ -3,7 +3,9 @@ package com.example.userdetails.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Timezone {
+import io.realm.RealmObject;
+
+public class Timezone extends RealmObject {
 
     @SerializedName("offset")
     @Expose

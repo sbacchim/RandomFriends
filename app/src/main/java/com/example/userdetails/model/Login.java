@@ -6,7 +6,9 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Login implements Parcelable {
+import io.realm.RealmObject;
+
+public class Login extends RealmObject implements Parcelable {
 
     @SerializedName("uuid")
     @Expose
@@ -29,6 +31,8 @@ public class Login implements Parcelable {
     @SerializedName("sha256")
     @Expose
     private String sha256;
+
+    public Login(){}
 
     protected Login(Parcel in) {
         uuid = in.readString();

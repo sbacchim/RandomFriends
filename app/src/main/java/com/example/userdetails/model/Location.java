@@ -8,7 +8,9 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.TimeZone;
 
-public class Location implements Parcelable {
+import io.realm.RealmObject;
+
+public class Location extends RealmObject implements Parcelable {
 
     @SerializedName("street")
     @Expose
@@ -28,6 +30,8 @@ public class Location implements Parcelable {
     @SerializedName("timezone")
     @Expose
     private Timezone timezone;
+
+    public Location(){}
 
     protected Location(Parcel in) {
         street = in.readString();

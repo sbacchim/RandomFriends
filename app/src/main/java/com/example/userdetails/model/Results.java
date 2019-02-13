@@ -1,14 +1,12 @@
 package com.example.userdetails.model;
 
-
 import android.os.Parcel;
 import android.os.Parcelable;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import io.realm.RealmObject;
 
-
-public class Results implements Parcelable {
+public class Results extends RealmObject implements Parcelable {
 
     @SerializedName("gender")
     @Expose
@@ -46,6 +44,8 @@ public class Results implements Parcelable {
     @SerializedName("nat")
     @Expose
     private String nat;
+
+    public Results(){}
 
     public static final Creator<Results> CREATOR = new Creator<Results>() {
         @Override
@@ -169,24 +169,6 @@ public class Results implements Parcelable {
 
     public void setNat(String nat) {
         this.nat = nat;
-    }
-
-    @Override
-    public String toString() {
-        return "Results{" +
-                "gender='" + gender + '\'' +
-                ", name=" + name +
-                ", location=" + location +
-                ", email='" + email + '\'' +
-                ", login=" + login +
-                ", dob=" + dob +
-                ", registered=" + registered +
-                ", phone='" + phone + '\'' +
-                ", cell='" + cell + '\'' +
-                ", id=" + id +
-                ", picture=" + picture +
-                ", nat='" + nat + '\'' +
-                '}';
     }
 
     @Override
