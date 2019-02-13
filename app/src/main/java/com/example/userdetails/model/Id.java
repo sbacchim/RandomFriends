@@ -17,6 +17,8 @@ public class Id extends RealmObject implements Parcelable {
     @Expose
     private String value;
 
+    public Id () {}
+
     protected Id(Parcel in) {
         name = in.readString();
         value = in.readString();

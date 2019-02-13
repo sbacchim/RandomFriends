@@ -32,6 +32,8 @@ public class Login extends RealmObject implements Parcelable {
     @Expose
     private String sha256;
 
+    public Login(){}
+
     protected Login(Parcel in) {
         uuid = in.readString();
         username = in.readString();

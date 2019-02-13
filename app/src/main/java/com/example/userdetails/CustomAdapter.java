@@ -9,10 +9,14 @@ import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 
+import com.example.userdetails.model.Name;
 import com.example.userdetails.model.Results;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 public class CustomAdapter extends RecyclerView.Adapter<UsersHolder> implements Filterable {
 
@@ -20,6 +24,7 @@ public class CustomAdapter extends RecyclerView.Adapter<UsersHolder> implements 
     private List<Results> finalFiltered;
     private int resource;
     private Context context;
+    List<Results> filtered;
 
     public CustomAdapter(Context context, int resource, List<Results> list) {
         this.results = list;
@@ -52,19 +57,34 @@ public class CustomAdapter extends RecyclerView.Adapter<UsersHolder> implements 
         return new Filter() {
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
+                Realm realm = Realm.getDefaultInstance();
                 String query = constraint.toString();
-                List<Results> filtered = new ArrayList<>();
+                filtered = new ArrayList<>();
                 if (query.isEmpty()) {
                     filtered = results;
                 } else {
-                    for (Results row : results) {
+                    realm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            RealmResults<Results> queryResults = realm
+                                    .where(Results.class)
+                                    .contains("name.first", query)
+                                    .or()
+                                    .contains("name.last", query)
+                                    .or()
+                                    .contains("name.title", query)
+                                    .findAll();
+
+                            for (Results row : queryResults) {
+                                    filtered.add(realm.copyFromRealm(row));
+                                     /*
                         if (row.getName().getFirst().toLowerCase().contains(query.toLowerCase())
                                 ||row.getName().getTitle().toLowerCase().contains(query.toLowerCase())
                                 || row.getName().getLast().toLowerCase().contains(query.toLowerCase())
-                                || row.getDob().getAge().toString().contains(constraint)) {
-                            filtered.add(row);
+                                || row.getDob().getAge().toString().contains(constraint)) */
+                            }
                         }
-                    }
+                    });
                 }
                 FilterResults filterResults = new FilterResults();
                 filterResults.count = filtered.size();

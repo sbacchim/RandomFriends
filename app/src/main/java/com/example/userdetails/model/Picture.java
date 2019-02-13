@@ -20,6 +20,8 @@ public class Picture extends RealmObject implements Parcelable {
     @Expose
     private String thumbnail;
 
+    public Picture(){}
+
     protected Picture(Parcel in) {
         large = in.readString();
         medium = in.readString();

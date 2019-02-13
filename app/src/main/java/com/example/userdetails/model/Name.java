@@ -20,6 +20,8 @@ public class Name extends RealmObject implements Parcelable {
     @Expose
     private String last;
 
+    public Name(){}
+
     protected Name(Parcel in) {
         title = in.readString();
         first = in.readString();
@@ -60,11 +62,6 @@ public class Name extends RealmObject implements Parcelable {
 
     public void setLast(String last) {
         this.last = last;
-    }
-
-    @Override
-    public String toString() {
-        return "" + title + " " + first + " " + last + "";
     }
 
     @Override

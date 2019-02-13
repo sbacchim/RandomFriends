@@ -12,39 +12,48 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import com.example.userdetails.model.Name;
+
+import com.example.userdetails.model.Results;
 import com.example.userdetails.model.Users;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity implements CustomAdapter.CustomAdapterListener {
 
     Gson gson;
     String jsonResults;
     Users users;
+    List<Results> unmanagedResults;
     CustomAdapter adapter;
     RecyclerView recyclerView;
-    ArrayList<Name> names;
     SearchView searchView;
+    File dir;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         users = new Users();
-        names = new ArrayList<>();
+
+        dir = getExternalFilesDir("userdetails/db");
 
         Realm.init(this);
-        RealmConfiguration config = new RealmConfiguration.Builder().name("usersrealm.realm").build();
+        RealmConfiguration config = new RealmConfiguration.Builder().name("usersrealm.realm").
+                directory(dir).build();
         Realm.setDefaultConfiguration(config);
 
         Toolbar tb = findViewById(R.id.toolbar);
@@ -75,6 +84,8 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
 
     class GsonDeserializer extends AsyncTask<String, Void, Users>{
 
+
+
         @Override
         protected void onPreExecute() {
             gson = new Gson();
@@ -83,10 +94,11 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
         @Override
         protected Users doInBackground(String... strings) {
 
+            Realm realm = Realm.getDefaultInstance();
             Users results = new Users();
 
            try {
-                URL url = new URL("https://randomuser.me/api/?results=100");
+                URL url = new URL("https://randomuser.me/api/?results=10");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 try {
                     InputStream in = new BufferedInputStream(urlConnection.getInputStream());
@@ -105,14 +117,34 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
             catch (Exception e) {
                 e.printStackTrace();
             }
+            final Users finalResults = results;
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    realm.insert(finalResults.getResults());
+                }
+            });
             return results;
         }
 
         @Override
         protected void onPostExecute(Users results) {
-            users = results;
+            users = new Users();
+            users.setResults(new ArrayList<>());
+            Realm realm = Realm.getDefaultInstance();
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    RealmResults<Results> queryResults = realm
+                            .where(Results.class)
+                            .findAll();
+                        users.getResults().addAll(queryResults);
+                }
+            });
+            unmanagedResults = realm.copyFromRealm(users.getResults());
+            Collections.reverse(unmanagedResults);
             adapter = new CustomAdapter(getBaseContext(),
-                    R.layout.list_item, users.getResults());
+                    R.layout.list_item, unmanagedResults);
             recyclerView.setAdapter(adapter);
             adapter.notifyDataSetChanged();
         }

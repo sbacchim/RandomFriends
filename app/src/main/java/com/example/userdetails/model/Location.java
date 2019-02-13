@@ -31,6 +31,8 @@ public class Location extends RealmObject implements Parcelable {
     @Expose
     private Timezone timezone;
 
+    public Location(){}
+
     protected Location(Parcel in) {
         street = in.readString();
         city = in.readString();

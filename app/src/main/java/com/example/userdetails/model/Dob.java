@@ -18,6 +18,8 @@ public class Dob extends RealmObject implements Parcelable {
     @Expose
     private Integer age;
 
+    public Dob(){}
+
     protected Dob(Parcel in) {
         date = in.readString();
         if (in.readByte() == 0) {

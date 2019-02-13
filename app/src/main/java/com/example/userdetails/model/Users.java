@@ -5,9 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 
-import io.realm.RealmObject;
-
-public class Users extends RealmObject {
+public class Users {
 
     @SerializedName("results")
     @Expose

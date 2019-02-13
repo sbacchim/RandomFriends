@@ -17,6 +17,8 @@ public class Registered extends RealmObject implements Parcelable {
     @Expose
     private Integer age;
 
+    public Registered(){}
+
     protected Registered(Parcel in) {
         date = in.readString();
         if (in.readByte() == 0) {
