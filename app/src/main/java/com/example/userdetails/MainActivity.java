@@ -2,7 +2,11 @@ package com.example.userdetails;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,6 +16,7 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.example.userdetails.model.Results;
 import com.example.userdetails.model.Users;
@@ -41,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
     RecyclerView recyclerView;
     SearchView searchView;
     File dir;
+    Snackbar snackbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
         recyclerView.setLayoutManager(llm);
         recyclerView.hasFixedSize();
 
+
+
         //Open list from DB
         startupList();
 
@@ -73,7 +81,18 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
         pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                new GsonDeserializer().execute();
+                ConnectivityManager cm =
+                        (ConnectivityManager) getBaseContext()
+                                .getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+                boolean isConnected = activeNetwork != null &&
+                        activeNetwork.isConnectedOrConnecting();
+                if (isConnected == false) {
+                    snackbar = Snackbar.make(findViewById(android.R.id.content),
+                            R.string.offline, Snackbar.LENGTH_LONG);
+                    snackbar.show();
+                } else
+                    new GsonDeserializer().execute();
                 pullToRefresh.setRefreshing(false);
             }
         });
@@ -84,8 +103,7 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
 
     }
 
-    class GsonDeserializer extends AsyncTask<String, Void, Users>{
-
+    class GsonDeserializer extends AsyncTask<String, Void, Users> {
 
 
         @Override
@@ -99,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
             Realm realm = Realm.getDefaultInstance();
             Users results = new Users();
 
-           try {
+            try {
                 URL url = new URL("https://randomuser.me/api/?results=10");
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 try {
@@ -107,16 +125,16 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
                     byte[] contents = new byte[1024];
                     int bytesRead = 0;
                     jsonResults = "";
-                    while((bytesRead = in.read(contents)) != -1) {
+                    while ((bytesRead = in.read(contents)) != -1) {
                         jsonResults += new String(contents, 0, bytesRead);
                     }
-                    Type resultType = new TypeToken<Users>(){}.getType();
+                    Type resultType = new TypeToken<Users>() {
+                    }.getType();
                     results = gson.fromJson(jsonResults, resultType);
                 } finally {
                     urlConnection.disconnect();
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             final Users finalResults = results;
@@ -140,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
                     RealmResults<Results> queryResults = realm
                             .where(Results.class)
                             .findAll();
-                        users.getResults().addAll(queryResults);
+                    users.getResults().addAll(queryResults);
                 }
             });
             unmanagedResults = realm.copyFromRealm(users.getResults());
@@ -152,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
         }
     }
 
-    public void startupList(){
+    public void startupList() {
         Realm realm = Realm.getDefaultInstance();
         RealmResults<Results> startList =
                 realm.where(Results.class).findAll();
