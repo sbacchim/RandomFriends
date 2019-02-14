@@ -44,6 +44,7 @@ public class Results extends RealmObject implements Parcelable {
     @SerializedName("nat")
     @Expose
     private String nat;
+    private int dbId;
 
     public Results(){}
 
@@ -191,5 +192,13 @@ public class Results extends RealmObject implements Parcelable {
         dest.writeString(cell);
         dest.writeString(email);
         dest.writeString(nat);
+    }
+
+    public int getDbId() {
+        return dbId;
+    }
+
+    public void setDbId(int dbId) {
+        this.dbId = dbId;
     }
 }

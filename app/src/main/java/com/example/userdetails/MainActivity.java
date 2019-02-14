@@ -6,21 +6,20 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-
 import com.example.userdetails.model.Results;
 import com.example.userdetails.model.Users;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -31,10 +30,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
+import io.realm.OrderedRealmCollection;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import io.realm.RealmList;
 import io.realm.RealmResults;
+import io.realm.Sort;
 
 public class MainActivity extends AppCompatActivity implements CustomAdapter.CustomAdapterListener {
 
@@ -42,11 +43,12 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
     String jsonResults;
     Users users;
     List<Results> unmanagedResults;
-    CustomAdapter adapter;
+    CustomRealmAdapter adapter;
     RecyclerView recyclerView;
     SearchView searchView;
     File dir;
     Snackbar snackbar;
+    Realm realm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,17 +66,11 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
 
         Toolbar tb = findViewById(R.id.toolbar);
         setSupportActionBar(tb);
-        getSupportActionBar().setTitle("Random Friends");
+        getSupportActionBar().setTitle(R.string.app_name);
 
-        recyclerView = findViewById(R.id.recyclerView);
-        LinearLayoutManager llm = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(llm);
-        recyclerView.hasFixedSize();
-
-
-
+        setupRecyclerView();
         //Open list from DB
-        startupList();
+        //startupList();
 
         //Pull to refresh
         final SwipeRefreshLayout pullToRefresh = findViewById(R.id.pullToRefresh);
@@ -105,10 +101,9 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
 
     class GsonDeserializer extends AsyncTask<String, Void, Users> {
 
-
         @Override
         protected void onPreExecute() {
-            gson = new Gson();
+            gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
         }
 
         @Override
@@ -141,7 +136,19 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
             realm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    realm.insert(finalResults.getResults());
+                    for(Results result : finalResults.getResults()) {
+                        Number currentIdNum = realm.where(Results.class)
+                                .max("dbId");
+                        int nextId;
+                        if(currentIdNum == null) {
+                            nextId = 1;
+                        } else {
+                            nextId = currentIdNum.intValue() + 1;
+                        }
+
+                            result.setDbId(nextId);
+                            realm.insert(result);
+                    }
                 }
             });
             return results;
@@ -155,31 +162,20 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
             realm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    RealmResults<Results> queryResults = realm
+                    RealmResults<Results> queryResults;
+                    queryResults = realm
                             .where(Results.class)
-                            .findAll();
+                            .findAll().sort("dbId", Sort.DESCENDING);
                     users.getResults().addAll(queryResults);
+                    adapter = new CustomRealmAdapter
+                            (queryResults, true);
                 }
             });
-            unmanagedResults = realm.copyFromRealm(users.getResults());
-            Collections.reverse(unmanagedResults);
-            adapter = new CustomAdapter(getBaseContext(),
-                    R.layout.list_item, unmanagedResults);
+            //unmanagedResults = realm.copyFromRealm(users.getResults());
+            realm.close();
             recyclerView.setAdapter(adapter);
-            adapter.notifyDataSetChanged();
+            //adapter.notifyDataSetChanged();
         }
-    }
-
-    public void startupList() {
-        Realm realm = Realm.getDefaultInstance();
-        RealmResults<Results> startList =
-                realm.where(Results.class).findAll();
-        users.setResults((ArrayList<Results>) realm.copyFromRealm(startList));
-        Collections.reverse(users.getResults());
-        adapter = new CustomAdapter(getBaseContext(),
-                R.layout.list_item, users.getResults());
-        recyclerView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -226,4 +222,21 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
         }
         super.onBackPressed();
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        recyclerView.setAdapter(null);
+        realm.close();
+    }
+
+    private void setupRecyclerView() {
+        realm = Realm.getDefaultInstance();
+        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new CustomRealmAdapter(realm.where(Results.class).findAll(), true);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setHasFixedSize(true);
+    }
+
 }
