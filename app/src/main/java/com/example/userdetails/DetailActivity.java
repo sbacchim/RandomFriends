@@ -12,6 +12,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.example.userdetails.model.Results;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
+
 public class DetailActivity extends AppCompatActivity {
 
     Results clicked;
@@ -27,11 +30,16 @@ public class DetailActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Realm realm = Realm.getDefaultInstance();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
         Intent intent = this.getIntent();
-        clicked = intent.getParcelableExtra("clicked");
-        clicked.getName();
+
+        int id = intent.getIntExtra("clicked", -1);
+        RealmResults temp = realm.where(Results.class)
+                .equalTo("dbId", id)
+                .findAll();
+        clicked = (Results) temp.first();
 
         Toolbar tb = findViewById(R.id.toolbar);
         setSupportActionBar(tb);
