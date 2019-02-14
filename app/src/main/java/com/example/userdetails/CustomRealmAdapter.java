@@ -35,6 +35,11 @@ public class CustomRealmAdapter extends RealmRecyclerViewAdapter<Results, Custom
         setHasStableIds(true);
     }
 
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
     @NonNull
     @Override
     public RealmUsersHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {

@@ -145,7 +145,6 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
                         } else {
                             nextId = currentIdNum.intValue() + 1;
                         }
-
                             result.setDbId(nextId);
                             realm.insert(result);
                     }
@@ -165,8 +164,8 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
                     RealmResults<Results> queryResults;
                     queryResults = realm
                             .where(Results.class)
-                            .findAll().sort("dbId", Sort.DESCENDING);
-                    users.getResults().addAll(queryResults);
+                            .findAll()
+                            .sort("dbId", Sort.DESCENDING);
                     adapter = new CustomRealmAdapter
                             (queryResults, true);
                 }
@@ -174,7 +173,6 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
             //unmanagedResults = realm.copyFromRealm(users.getResults());
             realm.close();
             recyclerView.setAdapter(adapter);
-            //adapter.notifyDataSetChanged();
         }
     }
 
