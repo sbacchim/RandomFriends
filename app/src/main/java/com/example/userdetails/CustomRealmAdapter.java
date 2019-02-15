@@ -1,6 +1,5 @@
 package com.example.userdetails;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -73,7 +72,7 @@ public class CustomRealmAdapter extends RealmRecyclerViewAdapter<Results, Custom
                 .append(Utils.capsMulti(result.getName().getLast())).toString());
         realmUsersHolder.ageView.setText(new StringBuilder().append("Age: ")
                 .append(result.getDob().getAge().toString()).toString());
-        Picasso.get().load(result.getPicture().getThumbnail()).into(realmUsersHolder.imageView);
+        Picasso.get().load(result.getPicture().getMedium()).into(realmUsersHolder.imageView);
     }
 
 

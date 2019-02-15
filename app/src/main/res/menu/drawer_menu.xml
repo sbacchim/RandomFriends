@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/refresh_list_nav"
+            android:title="@string/refresh" />
+        <item
+            android:id="@+id/delete_list_nav"
+            android:title="@string/delete" />
+        <item
+            android:id = "@+id/app_info"
+            android:title="@string/app_info"/>
+    </group>
+</menu>

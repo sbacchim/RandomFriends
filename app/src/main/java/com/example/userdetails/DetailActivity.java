@@ -73,7 +73,7 @@ public class DetailActivity extends AppCompatActivity {
                 .append("E-mail: ").append(clicked.getEmail()).toString());
         location.setText(new StringBuilder()
                 .append("City: ").append(Utils.capsMulti(clicked.getLocation().getCity())).toString());
-        new DownloadImageTask(imageView).execute(clicked.getPicture().getMedium());
+        new DownloadImageTask(imageView).execute(clicked.getPicture().getLarge());
 
         fab.setOnClickListener(new View.OnClickListener() {
            @Override

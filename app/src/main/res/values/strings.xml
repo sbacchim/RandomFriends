@@ -11,6 +11,11 @@
     <string name="ok">confirm</string>
     <string name="cancel">cancel</string>
     <string name="cancel_alert_title">Warning!</string>
-    <string name="cancel_alert_msg">This will delete all data permanently. You will not be able to retrieve them. Continue?</string>
-    <string name="cancel_single_alert_msg">This will delete this user permanently. You will not be able to retrieve it. Continue?</string>
+    <string name="cancel_alert_msg">This will delete all data permanently. You will not be able to retrieve them.\n\nContinue?</string>
+    <string name="cancel_single_alert_msg">This will delete this user permanently. You will not be able to retrieve it.\n\nContinue?</string>
+    <string name="refresh">Refresh list</string>
+    <string name="delete">Delete users</string>
+    <string name="app_info">App info</string>
+    <string name="app_info_text">Developed by Simone Bacchi Mottin\n\nDSGroup S.p.A.\n\n</string>
+    <string name="github_link">For further info, check out my <a href="https://github.com/sbacchim">github</a> page.</string>
 </resources>

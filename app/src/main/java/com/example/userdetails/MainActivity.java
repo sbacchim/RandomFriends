@@ -5,11 +5,16 @@ import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
@@ -52,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
     File dir;
     Snackbar snackbar;
     Realm realm;
+    DrawerLayout drawerLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,10 +76,12 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
         Toolbar tb = findViewById(R.id.toolbar);
         setSupportActionBar(tb);
         getSupportActionBar().setTitle(R.string.app_name);
+        ActionBar actionbar = getSupportActionBar();
+        actionbar.setDisplayHomeAsUpEnabled(true);
+        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
 
+        setupNavigationDrawer();
         setupRecyclerView();
-        //Open list from DB
-        //startupList();
 
         //Pull to refresh
         final SwipeRefreshLayout pullToRefresh = findViewById(R.id.pullToRefresh);
@@ -83,7 +91,9 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
                 ConnectivityManager cm =
                         (ConnectivityManager) getBaseContext()
                                 .getSystemService(Context.CONNECTIVITY_SERVICE);
+
                 NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
                 boolean isConnected = activeNetwork != null &&
                         activeNetwork.isConnectedOrConnecting();
                 if (isConnected == false) {
@@ -95,6 +105,41 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
                 pullToRefresh.setRefreshing(false);
             }
         });
+    }
+
+    private void setupNavigationDrawer() {
+        drawerLayout = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        switch (menuItem.getItemId()) {
+                            case R.id.refresh_list_nav:
+                                ConnectivityManager cm =
+                                        (ConnectivityManager) getBaseContext()
+                                                .getSystemService(Context.CONNECTIVITY_SERVICE);
+                                NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+                                boolean isConnected = activeNetwork != null &&
+                                        activeNetwork.isConnectedOrConnecting();
+                                if (isConnected == false) {
+                                    snackbar = Snackbar.make(findViewById(android.R.id.content),
+                                            R.string.offline, Snackbar.LENGTH_LONG);
+                                    snackbar.show();
+                                } else
+                                    new GsonDeserializer().execute();
+                                break;
+
+                            case R.id.delete_list_nav:
+                                deleteAlertDialog();
+                                break;
+                            case R.id.app_info:
+                                appInfoActivity();
+                        }
+                        drawerLayout.closeDrawers();
+                        return true;
+                    }
+                });
     }
 
     @Override
@@ -173,7 +218,6 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
                             (queryResults, true);
                 }
             });
-            //unmanagedResults = realm.copyFromRealm(users.getResults());
             realm.close();
             recyclerView.setAdapter(adapter);
         }
@@ -204,24 +248,17 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
             }
         });
 
-        MenuItem menuItem = menu.findItem(R.id.action_clean);
-        menuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                deleteAlertDialog();
-                return true;
-            }
-
-        });
-
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_search) {
-            return true;
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                drawerLayout.openDrawer(GravityCompat.START);
+                break;
+            case R.id.action_search:
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -274,6 +311,11 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
         });
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    public void appInfoActivity(){
+        Intent intent = new Intent(this, AppInfo.class);
+        startActivity(intent);
     }
 
 }
