@@ -1,6 +1,9 @@
 package com.example.userdetails;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -74,7 +77,7 @@ public class CustomRealmAdapter extends RealmRecyclerViewAdapter<Results, Custom
     }
 
 
-    public class RealmUsersHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class RealmUsersHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
         public Results data;
         public TextView nameView;
@@ -89,7 +92,7 @@ public class CustomRealmAdapter extends RealmRecyclerViewAdapter<Results, Custom
             this.ageView = itemView.findViewById(R.id.person_age);
             this.imageView = itemView.findViewById(R.id.person_photo);
             itemView.setOnClickListener(this);
-
+            itemView.setOnLongClickListener(this::onLongClick);
         }
 
         @Override
@@ -103,6 +106,38 @@ public class CustomRealmAdapter extends RealmRecyclerViewAdapter<Results, Custom
                         "" + Utils.caps(clicked.getName().getFirst()) + " " +
                         Utils.capsMulti(clicked.getName().getLast()) + "", Toast.LENGTH_SHORT).show();
             }
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            deleteSingleItemAlert(this.data);
+            return true;
+        }
+
+        public void deleteSingleItemAlert(Results deleting){
+            AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
+            builder.setMessage(R.string.cancel_single_alert_msg)
+                    .setTitle(R.string.cancel_alert_title);
+
+            // Add the buttons
+            builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener(){
+                public void onClick(DialogInterface dialog, int id) {
+                    realm = Realm.getDefaultInstance();
+                    realm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            deleting.deleteFromRealm();
+                        }
+                    });
+                }
+            });
+            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
         }
     }
 

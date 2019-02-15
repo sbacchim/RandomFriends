@@ -8,4 +8,9 @@
     <string name="offline">Your device is offline.</string>
     <string name="reconnect">Reconnect</string>
     <string name="retry">Retry</string>
+    <string name="ok">confirm</string>
+    <string name="cancel">cancel</string>
+    <string name="cancel_alert_title">Warning!</string>
+    <string name="cancel_alert_msg">This will delete all data permanently. You will not be able to retrieve them. Continue?</string>
+    <string name="cancel_single_alert_msg">This will delete this user permanently. You will not be able to retrieve it. Continue?</string>
 </resources>

@@ -1,7 +1,10 @@
 package com.example.userdetails;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -200,6 +203,17 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
                 return false;
             }
         });
+
+        MenuItem menuItem = menu.findItem(R.id.action_clean);
+        menuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                deleteAlertDialog();
+                return true;
+            }
+
+        });
+
         return true;
     }
 
@@ -235,6 +249,31 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
         adapter = new CustomRealmAdapter(realm.where(Results.class).findAll(), true);
         recyclerView.setAdapter(adapter);
         recyclerView.setHasFixedSize(true);
+    }
+
+    public void deleteAlertDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setMessage(R.string.cancel_alert_msg)
+                .setTitle(R.string.cancel_alert_title);
+
+        // Add the buttons
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener(){
+            public void onClick(DialogInterface dialog, int id) {
+                realm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        realm.deleteAll();
+                    }
+                });
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
 }
