@@ -65,21 +65,13 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
         setContentView(R.layout.activity_main);
 
         users = new Users();
-
         dir = getExternalFilesDir("userdetails/db");
-
         Realm.init(this);
         RealmConfiguration config = new RealmConfiguration.Builder().name("usersrealm.realm").
                 directory(dir).build();
         Realm.setDefaultConfiguration(config);
 
-        Toolbar tb = findViewById(R.id.toolbar);
-        setSupportActionBar(tb);
-        getSupportActionBar().setTitle(R.string.app_name);
-        ActionBar actionbar = getSupportActionBar();
-        actionbar.setDisplayHomeAsUpEnabled(true);
-        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
-
+        setupToolbar();
         setupNavigationDrawer();
         setupRecyclerView();
 
@@ -96,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
 
                 boolean isConnected = activeNetwork != null &&
                         activeNetwork.isConnectedOrConnecting();
+
                 if (isConnected == false) {
                     snackbar = Snackbar.make(findViewById(android.R.id.content),
                             R.string.offline, Snackbar.LENGTH_LONG);
@@ -105,6 +98,15 @@ public class MainActivity extends AppCompatActivity implements CustomAdapter.Cus
                 pullToRefresh.setRefreshing(false);
             }
         });
+    }
+
+    private void setupToolbar() {
+        Toolbar tb = findViewById(R.id.toolbar);
+        setSupportActionBar(tb);
+        getSupportActionBar().setTitle(R.string.app_name);
+        ActionBar actionbar = getSupportActionBar();
+        actionbar.setDisplayHomeAsUpEnabled(true);
+        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
     }
 
     private void setupNavigationDrawer() {
